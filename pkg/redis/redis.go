@@ -1,0 +1,28 @@
+package redis
+
+import (
+	"context"
+	"fmt"
+	"github.com/JohnGeorge47/stock-application/internal/configmanager"
+	"github.com/go-redis/redis/v8"
+)
+
+type RedisClient struct {
+	*redis.Client
+}
+
+var Rdb *RedisClient
+
+func InitConnection() {
+	config := configmanager.GetConfig()
+	Rdb.Client = redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprint("%s:%s", config.RedisConfig.Host, config.RedisConfig.Port),
+		DB:       config.RedisConfig.Db,
+		Password: "",
+	})
+}
+
+func (r *RedisClient) Exists(ctx context.Context, key string) {
+	val := r.Client.Exists(ctx, key)
+	fmt.Println(val)
+}

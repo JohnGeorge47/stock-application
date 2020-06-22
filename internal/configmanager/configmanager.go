@@ -7,13 +7,20 @@ import (
 )
 
 // ApplicationConfig is the configuration for the ApplicationConfig
-type ApplicatonConfig struct {
-	ProcessName string   `json:"process_name,omitempty"`
-	Origins     []string `json:"origins"`
+type ApplicationConfig struct {
+	ProcessName string    `json:"process_name,omitempty"`
+	Origins     []string  `json:"origins"`
+	RedisConfig RdbConfig `json:"redis_config"`
+}
+
+type RdbConfig struct {
+	Host string `json:"host"`
+	Port string `json:"port"`
+	Db   int    `json:"db"`
 }
 
 // Config stores the configuration
-var Config *ApplicatonConfig
+var Config *ApplicationConfig
 var configFile *string
 
 // LoadConfiguration loads configuration from file
@@ -23,7 +30,7 @@ func LoadConfiguration() error {
 	if configFile == nil {
 		return errors.New("config not initialized")
 	}
-	config := new(ApplicatonConfig)
+	config := new(ApplicationConfig)
 	file, err := os.Open(*configFile)
 	if err != nil {
 		return err
@@ -37,7 +44,7 @@ func LoadConfiguration() error {
 
 // GetConfig returns a copy of init-ed application config instance
 // if not already initialized it is initialized with "." as config path
-func GetConfig() ApplicatonConfig {
+func GetConfig() ApplicationConfig {
 	return *Config
 }
 
