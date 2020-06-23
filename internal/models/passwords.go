@@ -14,11 +14,13 @@ type UserPassword struct {
 }
 
 func PasswordCreate(password UserPassword)error{
-	query := "INSERT INTO passwords(user_email,password,updated_at,user_id)values(?,?,?,(SELECT user_id FROM users WHERE email_id=?))"
+	fmt.Println(password)
+	query := "INSERT INTO passwords(email_id,password,updated_at,user_id)values(?,?,?,(SELECT user_id FROM users WHERE email_id=?))"
 	conn := sql.Connmanager
 	fmt.Println(query)
 	fmt.Println(password)
 	val, err := conn.Insert(query, password.UserEmail, password.Password, password.Updated_at, password.UserEmail)
+	fmt.Println(val)
 	if err != nil {
 		return err
 	}
@@ -27,7 +29,7 @@ func PasswordCreate(password UserPassword)error{
 
 func GetPassword(email string) (*string, error) {
 	var pass string
-	query := "SELECT password FROM passwords WHERE user_email=?"
+	query := "SELECT password FROM passwords WHERE email_id=?"
 	conn := sql.Connmanager
 	rows, err := conn.Select(query, email)
 	if err != nil {

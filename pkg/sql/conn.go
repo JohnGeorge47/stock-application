@@ -21,6 +21,7 @@ func InitMysqlConn()error{
 		return err
 	}
 	Connmanager = Client{DB: db}
+	return nil
 }
 
 func Connectionstring() string {

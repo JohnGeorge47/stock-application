@@ -5,19 +5,20 @@ import (
 	"flag"
 	"fmt"
 	"github.com/JohnGeorge47/stock-application/internal/configmanager"
+	"github.com/JohnGeorge47/stock-application/internal/models"
 	"github.com/JohnGeorge47/stock-application/internal/socket"
-	"github.com/JohnGeorge47/stock-application/pkg/redis"
 	"github.com/gorilla/websocket"
 	"github.com/JohnGeorge47/stock-application/cmd/http/handlers"
 	"log"
 	"net/http"
 	"strings"
 	"github.com/JohnGeorge47/stock-application/pkg/sql"
+	"time"
 )
 
 var (
 	config = flag.String("config", "./config.json", "config file path")
-	port   = flag.String("port", "8000", "Host port")
+	port   = flag.String("port", "3003", "Host port")
 )
 
 var upgrader = websocket.Upgrader{
@@ -47,6 +48,22 @@ func main() {
 	ctx := context.Background()
 	hub := socket.NewHub()
 	go hub.Run(ctx)
+	//here im running a background ticker which will do a db update every n seconds
+	ticker:=time.NewTicker(500*time.Millisecond)
+	quit := make(chan struct{})
+	go func() {
+		for{
+			select {
+			case <-ticker.C:
+				fmt.Println("woops")
+				models.UpdateStocks()
+			case <-quit:
+				ticker.Stop()
+				return
+			}
+		}
+	}()
+	//This is the handler for the ws
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		serveWs(hub, w, r, ctx)
 	})
@@ -56,6 +73,8 @@ func main() {
 		fmt.Println(err)
 	}
 }
+
+
 
 func serveWs(hub *socket.Hub, w http.ResponseWriter, r *http.Request, ctx context.Context) {
 	ws, err := upgrader.Upgrade(w, r, nil)

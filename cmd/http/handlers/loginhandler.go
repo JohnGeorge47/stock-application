@@ -24,7 +24,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		err=password.Login(form.userEmail, form.password)
+		//err=password.Login(form.userEmail, form.password)
 		if err!=nil{
 			http.Error(w,"Incorrect email_id or password",http.StatusForbidden)
 		}

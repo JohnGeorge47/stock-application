@@ -1,6 +1,7 @@
-package createuser
+package user
 
 import (
+	"fmt"
 	"github.com/JohnGeorge47/stock-application/internal/models"
 	"golang.org/x/crypto/bcrypt"
 	"time"
@@ -16,6 +17,7 @@ const createdFormat = "2006-01-02 15:04:05"
 
 
 func Create(user Signup)error{
+	fmt.Println(user)
 	userdata:=models.User{
 		EmailId:    user.EmailId,
 		UserName:   user.UserName,
@@ -27,7 +29,7 @@ func Create(user Signup)error{
 	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
 	pwdData:=models.UserPassword{
 		UserId:     string(*lastinsert),
-		UserEmail:   user.UserName,
+		UserEmail:   user.EmailId,
 		Password:   string(hash),
 		Updated_at: time.Unix(1391878657, 0).Format(createdFormat),
 	}
