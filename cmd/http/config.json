@@ -1,4 +1,11 @@
 {
+  "sql_conf": {
+    "db_user": "root",
+    "db_pwd": "password",
+    "db_port": "3306",
+    "db_host": "localhost",
+    "db_name": "stockapp"
+  },
   "redis_config": {
     "host": "localhost",
     "port": "6379",

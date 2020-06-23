@@ -11,18 +11,20 @@ type RedisClient struct {
 	*redis.Client
 }
 
-var Rdb *RedisClient
+var Rdb RedisClient
 
 func InitConnection() {
 	config := configmanager.GetConfig()
+	addr := fmt.Sprintf("%s:%s", config.RedisConfig.Host, config.RedisConfig.Port)
 	Rdb.Client = redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprint("%s:%s", config.RedisConfig.Host, config.RedisConfig.Port),
+		Addr:     addr,
 		DB:       config.RedisConfig.Db,
 		Password: "",
 	})
+	fmt.Println("here")
 }
 
-func (r *RedisClient) Exists(ctx context.Context, key string) {
+func (r RedisClient) Exists(ctx context.Context, key string) {
 	val := r.Client.Exists(ctx, key)
 	fmt.Println(val)
 }

@@ -11,6 +11,15 @@ type ApplicationConfig struct {
 	ProcessName string    `json:"process_name,omitempty"`
 	Origins     []string  `json:"origins"`
 	RedisConfig RdbConfig `json:"redis_config"`
+	SqlConf     MySqlConf `json:"sql_conf"`
+}
+
+type MySqlConf struct {
+	DbUser string `json:"db_user"`
+	DbPwd  string `json:"db_pwd"`
+	DbPort string `json:"db_port"`
+	DbHost string `json:"db_host"`
+	DbName string `json:"db_name"`
 }
 
 type RdbConfig struct {
