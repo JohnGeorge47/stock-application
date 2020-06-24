@@ -48,3 +48,15 @@ CREATE TABLE `stockapp`.`user_stock` (
     REFERENCES `stockapp`.`stocks` (`stock_id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION);
+
+CREATE TABLE `stockapp`.`sessions` (
+  `idsessions` INT NOT NULL,
+  `user_id` INT NOT NULL,
+  `sessions_token` INT NOT NULL,
+  PRIMARY KEY (`idsessions`),
+  INDEX `fk_sessions_1_idx` (`user_id` ASC),
+  CONSTRAINT `fk_sessions_1`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `stockapp`.`users` (`user_id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION);

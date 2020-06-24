@@ -28,3 +28,8 @@ func (r RedisClient) Exists(ctx context.Context, key string) {
 	val := r.Client.Exists(ctx, key)
 	fmt.Println(val)
 }
+
+func (r RedisClient) PushArray(ctx context.Context, key string, val string) {
+	res := r.Client.LPush(ctx, key, val)
+	fmt.Println(res)
+}

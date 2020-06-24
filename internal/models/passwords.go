@@ -13,7 +13,7 @@ type UserPassword struct {
 	Updated_at string `json:"updated_at""`
 }
 
-func PasswordCreate(password UserPassword)error{
+func PasswordCreate(password UserPassword) error {
 	fmt.Println(password)
 	query := "INSERT INTO passwords(email_id,password,updated_at,user_id)values(?,?,?,(SELECT user_id FROM users WHERE email_id=?))"
 	conn := sql.Connmanager

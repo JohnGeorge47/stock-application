@@ -4,15 +4,15 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/JohnGeorge47/stock-application/cmd/http/handlers"
 	"github.com/JohnGeorge47/stock-application/internal/configmanager"
 	"github.com/JohnGeorge47/stock-application/internal/models"
 	"github.com/JohnGeorge47/stock-application/internal/socket"
+	"github.com/JohnGeorge47/stock-application/pkg/sql"
 	"github.com/gorilla/websocket"
-	"github.com/JohnGeorge47/stock-application/cmd/http/handlers"
 	"log"
 	"net/http"
 	"strings"
-	"github.com/JohnGeorge47/stock-application/pkg/sql"
 	"time"
 )
 
@@ -41,21 +41,20 @@ func main() {
 		fmt.Println(err)
 	}
 	//redis.InitConnection()
-	err:=sql.InitMysqlConn()
-	if err!=nil{
-		log.Fatal(err,"Error connecting to mysql")
+	err := sql.InitMysqlConn()
+	if err != nil {
+		log.Fatal(err, "Error connecting to mysql")
 	}
 	ctx := context.Background()
 	hub := socket.NewHub()
 	go hub.Run(ctx)
 	//here im running a background ticker which will do a db update every n seconds
-	ticker:=time.NewTicker(500*time.Millisecond)
+	ticker := time.NewTicker(1000 * time.Millisecond)
 	quit := make(chan struct{})
 	go func() {
-		for{
+		for {
 			select {
 			case <-ticker.C:
-				fmt.Println("woops")
 				models.UpdateStocks()
 			case <-quit:
 				ticker.Stop()
@@ -67,14 +66,13 @@ func main() {
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		serveWs(hub, w, r, ctx)
 	})
-	http.Handle("/create_user",http.HandlerFunc(handlers.SignupHandler))
+	http.Handle("/create_user", http.HandlerFunc(handlers.SignupHandler))
+	http.Handle("/validate_user", http.HandlerFunc(handlers.SessionHandler))
 	fmt.Println("server Listening on", *port)
 	if err := http.ListenAndServe(fmt.Sprintf(":%s", *port), nil); err != nil {
 		fmt.Println(err)
 	}
 }
-
-
 
 func serveWs(hub *socket.Hub, w http.ResponseWriter, r *http.Request, ctx context.Context) {
 	ws, err := upgrader.Upgrade(w, r, nil)

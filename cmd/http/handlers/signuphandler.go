@@ -1,35 +1,47 @@
 package handlers
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/JohnGeorge47/stock-application/internal/core/user"
-	"github.com/JohnGeorge47/stock-application/pkg/uuid"
 	"net/http"
 )
 
+type SignupResponse struct {
+	Method       string `json:"method"`
+	Success      bool   `json:"success"`
+	RequestToken string `json:"request_token"`
+}
 
-
-func SignupHandler(w http.ResponseWriter,r *http.Request){
+func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "POST":
+		var sresponse SignupResponse
+		sresponse.Method = r.Method
 		contentType := r.Header.Get("Content-type")
 		if contentType != "application/x-www-form-urlencoded" {
 			w.WriteHeader(http.StatusUnsupportedMediaType)
 			return
 		}
-		signup,err:=ValidateSignupForm(r)
+		signup, err := ValidateSignupForm(r)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		err= user.Create(*signup)
-		reqtoken:=uuid.GetUUID()
-		fmt.Println(reqtoken)
-		if err!=nil{
-			http.Error(w,err.Error(),http.StatusInternalServerError)
+		reqToken, err := user.Create(*signup)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		fmt.Println(*reqToken)
+		sresponse.Success = true
+		sresponse.RequestToken = *reqToken
+		jsonres, err := json.Marshal(sresponse)
+		fmt.Println(err)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jsonres)
+
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
@@ -37,7 +49,7 @@ func SignupHandler(w http.ResponseWriter,r *http.Request){
 
 func ValidateSignupForm(r *http.Request) (*user.Signup, error) {
 	var signup user.Signup
-	err:=r.ParseForm()
+	err := r.ParseForm()
 	if err != nil {
 		return nil, err
 	}

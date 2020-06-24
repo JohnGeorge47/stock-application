@@ -9,7 +9,7 @@ import (
 
 var Connmanager Isql
 
-func InitMysqlConn()error{
+func InitMysqlConn() error {
 	db, err := sql.Open("mysql", Connectionstring())
 	if err != nil {
 		return err
