@@ -8,6 +8,7 @@ import (
 	"github.com/JohnGeorge47/stock-application/internal/configmanager"
 	"github.com/JohnGeorge47/stock-application/internal/models"
 	"github.com/JohnGeorge47/stock-application/internal/socket"
+	"github.com/JohnGeorge47/stock-application/pkg/processor"
 	"github.com/JohnGeorge47/stock-application/pkg/sql"
 	"github.com/gorilla/websocket"
 	"log"
@@ -62,11 +63,27 @@ func main() {
 			}
 		}
 	}()
+	//Here we have a processor which does the background job of publishing messages to the ws
+	//connection
+	done := make(chan struct{})
+	procesticker := time.NewTicker(1000 * time.Millisecond)
+	go func() {
+		for {
+			select {
+			case <-procesticker.C:
+				processor.Worker(hub)
+			case <-done:
+				ticker.Stop()
+				return
+			}
+		}
+	}()
 	//This is the handler for the ws
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		serveWs(hub, w, r, ctx)
 	})
 	http.Handle("/create_user", http.HandlerFunc(handlers.SignupHandler))
+	http.Handle("/login", http.HandlerFunc(handlers.LoginHandler))
 	http.Handle("/validate_user", http.HandlerFunc(handlers.SessionHandler))
 	fmt.Println("server Listening on", *port)
 	if err := http.ListenAndServe(fmt.Sprintf(":%s", *port), nil); err != nil {
@@ -79,14 +96,14 @@ func serveWs(hub *socket.Hub, w http.ResponseWriter, r *http.Request, ctx contex
 	if err != nil {
 		fmt.Println(err)
 	}
-	userid := r.URL.Query().Get("user_id")
-	session_id := r.URL.Query().Get("session_id")
+	userid := r.URL.Query().Get("email_id")
+	session_id := r.URL.Query().Get("session_token")
 	if &userid == nil {
 		fmt.Println(ctx, "No user id specified")
 		ws.Close()
 	}
 	if &session_id == nil {
-		fmt.Println(ctx, "No user id specified")
+		fmt.Println(ctx, "No session_token provided specified")
 		ws.Close()
 	}
 	conn := &socket.Client{

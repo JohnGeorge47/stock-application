@@ -20,7 +20,6 @@ func (c Client) Insert(query string, args ...interface{}) (*int64, error) {
 		fmt.Println(err)
 		return nil, err
 	}
-	fmt.Println(rows.RowsAffected())
 	lastid, err := rows.LastInsertId()
 	if err != nil {
 		return nil, err
