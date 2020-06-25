@@ -12,6 +12,7 @@ type ApplicationConfig struct {
 	Origins     []string  `json:"origins"`
 	RedisConfig RdbConfig `json:"redis_config"`
 	SqlConf     MySqlConf `json:"sql_conf"`
+	ProcessTime int			`json:"process_time"`
 }
 
 type MySqlConf struct {

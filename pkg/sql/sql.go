@@ -21,6 +21,7 @@ func (c Client) Insert(query string, args ...interface{}) (*int64, error) {
 		return nil, err
 	}
 	lastid, err := rows.LastInsertId()
+	defer stmt.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -36,5 +37,6 @@ func (c Client) Select(query string, args ...interface{}) (*sql.Rows, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
 	return res, err
 }
