@@ -11,6 +11,7 @@
     "port": "6379",
     "db" : 0
   },
+  "process_time": 1000,
   "origins": [
     "localhost:5000"
   ]
