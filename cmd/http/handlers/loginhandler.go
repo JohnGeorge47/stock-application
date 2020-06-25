@@ -14,6 +14,7 @@ type Login struct {
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	EnableCors(&w)
 	switch r.Method {
 	case "POST":
 		var loginresp SignupResponse
@@ -50,6 +51,10 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
+}
+
+func EnableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }
 
 func ValidateForm(r *http.Request) (*Login, error) {

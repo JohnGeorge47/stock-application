@@ -13,17 +13,18 @@ type Validate struct {
 }
 
 func SessionHandler(w http.ResponseWriter, r *http.Request) {
+	EnableCors(&w)
 	switch r.Method {
 	case "GET":
 		var response Validate
 		response.Method = http.MethodGet
-		session_token := r.Header.Get("session-token")
-		if session_token == "" {
+		session_token := r.URL.Query()["session_token"]
+		if session_token[0] == "" {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 		qparams := r.URL.Query()["email_id"]
-		val, err := user.Validate(session_token, qparams[0])
+		val, err := user.Validate(session_token[0], qparams[0])
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

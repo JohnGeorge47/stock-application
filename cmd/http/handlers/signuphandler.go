@@ -15,6 +15,7 @@ type SignupResponse struct {
 }
 
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
+	EnableCors(&w)
 	switch r.Method {
 	case "POST":
 		var sresponse SignupResponse
