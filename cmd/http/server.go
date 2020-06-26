@@ -106,6 +106,15 @@ func serveWs(hub *socket.Hub, w http.ResponseWriter, r *http.Request, ctx contex
 		fmt.Println(ctx, "No session_token provided specified")
 		ws.Close()
 	}
+	ok,err:=models.CheckSession(userid,session_id)
+	if err!=nil{
+		fmt.Println(err)
+		ws.Close()
+	}
+	if !*ok{
+		fmt.Println("Not a valid session_id")
+		ws.Close()
+	}
 	conn := &socket.Client{
 		WS:     ws,
 		Send:   make(chan []byte, 256),
